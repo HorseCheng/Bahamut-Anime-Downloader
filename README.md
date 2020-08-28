@@ -30,6 +30,7 @@
 請開啟**Chrome瀏覽器**並按**F12**開啟**開發人員工具**，並點擊**Network**頁面
 2. 連線到**巴哈動畫瘋官網**首頁: [官網連結](https://ani.gamer.com.tw/)  
 並在Network頁面選擇**ani.agmer.com.tw**之欄位  
+(註: 如果沒有看到，可以嘗試按F5，應該較能看到)  
 ![教學](https://i.imgur.com/lm85wlR.png)
 3. 滑到底部，並複製cookie欄後的文字 (例如以下方圖為例: 複製 __cfduid ~ 933 區段) 
 (註: 若有正確登入，通常cookie資訊會非常長)  

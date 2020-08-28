@@ -34,7 +34,9 @@ headers["referer"] = f"https://ani.gamer.com.tw/animeVideo.php?sn={sn}"
 
 finder=requests.get(f"https://ani.gamer.com.tw/animeVideo.php?sn={sn}",headers=headers)
 downloadlist=re.findall('<a href="\?sn=(.*?)">.*?</a>', finder.text)
+if(downloadlist==[]): downloadlist=[sn]
 namelist=re.findall('<a href="\?sn=.*?">(.*?)</a>', finder.text)
+
 index=downloadlist.index(sn)
 
 if ("-a" in sninput):
