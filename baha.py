@@ -73,7 +73,7 @@ for times, i in enumerate(downloadlist):
     requests.get(f"https://ani.gamer.com.tw/ajax/unlock.php?sn={sn}&ttl=0",headers=headers) #unlock
     requests.get(f"https://ani.gamer.com.tw/ajax/checklock.php?device={deviceid}&sn={sn}",headers=headers) #checklock
 
-    if(not vip ):
+    if(not vip):
         print("等待 30 秒 廣告時間中...")
         requests.get(f"https://ani.gamer.com.tw/ajax/unlock.php?sn={sn}&ttl=0",headers=headers) #unlock
         requests.get(f"https://ani.gamer.com.tw/ajax/unlock.php?sn={sn}&ttl=0",headers=headers) #unlock
@@ -98,8 +98,7 @@ for times, i in enumerate(downloadlist):
             print("可嘗試更新cookie資訊")
             import sys
             sys.exit(0)
-        
-    #resolutionurl="https:\/\/gamer-cds.cdn.hinet.net\/vod_gamer\/_definst_\/smil:gamer2\/1105960c61553a4166f4b71bfb2e8fb9cb2710df\/hls-s-ae-2s.smil\/playlist.m3u8?token=s8ub07nihuER0aQDTkPPzA&expires=1598302260&bahaData=HorseCheng%3A16870%3A0%3APC%3A25761"
+
     resolutionm3u8=requests.get(resolutionurl.replace("\\",""), headers=headers).content
     with open("resolution.m3u8","wb") as f:
         f.write(resolutionm3u8)
@@ -108,18 +107,19 @@ for times, i in enumerate(downloadlist):
     with open("resolution.m3u8","r") as f:
         resolution=f.read()
     
-    innlist = re.findall("(chunklist_.*)\n", resolution)
+    innlist = re.findall("([0-9]+p.*/chunklist_.*).m3u8\n", resolution)
     reslist = re.findall("RESOLUTION=(.*)", resolution)
+    title = re.findall("(.*/)playlist", resolutionurl.replace("\\",""))[0]
     if (times==0):
         for res in reslist:
            print(f"{res}")
         reschoice=input("請選擇下載解析度 (AXB可輸入A即可): ")  
     try:
         matching=[i for i, e in enumerate(reslist) if (reschoice in e) ] [0]
-        inn=resolutionurl.replace( "playlist", re.findall("chunklist_b[0-9]+", innlist[matching])[0] )
+        inn=resolutionurl.replace( "playlist_basic", innlist[matching] )
     except :
         if(times==0):print("輸入與選項不符 自動選擇下載最高解析度")
-        inn=resolutionurl.replace( "playlist", re.findall("chunklist_b[0-9]+", innlist[-1])[0] )
+        inn=resolutionurl.replace( "playlist_basic", innlist[-1] )
     
     print()
     try: os.makedirs("temp")
@@ -128,13 +128,10 @@ for times, i in enumerate(downloadlist):
     except:pass
     try: os.makedirs("output")
     except:pass
-    
-    title = re.findall(".*smil/*",inn)[0]
-    m3u8url = re.findall("chunklist.*",inn)[0]
-    
-    m3u8html=requests.get(title+m3u8url,headers=headers)
-    
-    num=0
+
+    m3u8url = re.findall("[0-9]+p.*chunklist.*",inn)[0]
+    m3u8html = requests.get(title+m3u8url,headers=headers)
+
     if(m3u8html.status_code == 200):
         with open("a.m3u8",'wb') as f:
           f.write(m3u8html.content)
@@ -143,21 +140,22 @@ for times, i in enumerate(downloadlist):
     with open ("a.m3u8","r") as f:
         m3u8files=f.readlines()
     
-    keyurl=re.findall('URI="(.*)"',m3u8files[4])[0]
-    key=requests.get(keyurl,headers=headers)
+    keyurl = re.findall('URI="(.*)"',m3u8files[4])[0]
+    title = re.findall("(.*?/)chunklist",title+m3u8url)[0]
+
+    key = requests.get(title+keyurl, headers=headers)
     with open("a.key" ,"wb" ) as f:
         f.write(key.content)
     
     with open("a.key","rb") as f:
         key=f.read()
-        
-    length=int ( ((len(m3u8files)-7)+0.5) //2 )
-    cnt=1
-    for i in range(6,len(m3u8files),2):
-        target=m3u8files[i]
+    
+    download_url = re.findall("media.*?ts", ''.join(m3u8files))
+    cnt, length = 1, len(download_url)
+    for i in range(length):
+        target = download_url[i]
         print(f"downloading {cnt}/{length}", end='\r', flush=True)
         content=requests.get(title+target,headers=headers, stream=True)    
-        num=0
         if(content.status_code == 200):
             with open(f"temp/a_{cnt}.ts",'wb') as f:
              	f.write(content.content)
