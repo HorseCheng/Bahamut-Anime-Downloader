@@ -117,11 +117,11 @@ for times, i in enumerate(downloadlist):
     try:
         matching=[i for i, e in enumerate(reslist) if (reschoice in e) ] [0]
         inn=resolutionurl.replace( "playlist_basic", innlist[matching] )
-        inn=resolutionurl.replace( "playlist_advance", innlist[matching] )
+        inn=inn.replace( "playlist_advance", innlist[matching] )
     except :
         if(times==0):print("輸入與選項不符 自動選擇下載最高解析度")
         inn=resolutionurl.replace( "playlist_basic", innlist[-1] )
-        inn=resolutionurl.replace( "playlist_advance", innlist[-1] )
+        inn=inn.replace( "playlist_advance", innlist[-1] )
     
     print()
     try: os.makedirs("temp")
